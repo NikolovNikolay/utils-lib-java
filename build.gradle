@@ -1,0 +1,69 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group 'com.nikolov'
+version '1.0'
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'utils-library'
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom {
+                name = 'Utilities library for java'
+                description = 'Provides useful tools for working with and processing primitive types'
+                licenses {
+                    license {
+                        name = 'The MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'NikolovNikolay'
+                        name = 'Nikolay Nikolov'
+                        email = 'nikolov89@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/NikolovNikolay/utils-lib-java.git'
+                    developerConnection = 'scm:git:ssh://github.com/NikolovNikolay/utils-lib-java.git'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
