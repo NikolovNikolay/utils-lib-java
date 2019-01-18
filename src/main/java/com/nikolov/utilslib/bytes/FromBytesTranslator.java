@@ -16,6 +16,9 @@ import java.util.Objects;
 
 import static com.nikolov.utilslib.primitives.PrimitiveType.*;
 
+/**
+ * Provides useful tools for parsing primitive values from bytes.
+ */
 public class FromBytesTranslator {
 
     private static final int EXPECTED_INT8_ARRAY_LENGTH = 1;
@@ -25,28 +28,20 @@ public class FromBytesTranslator {
     private static final int EXPECTED_FLOAT_ARRAY_LENGTH = 4;
     private static final int EXPECTED_DOUBLE_ARRAY_LENGTH = 8;
 
-    private ByteBuffer bb;
+    private ByteBuffer byteBuffer;
     private int positionIndex;
 
-    public byte[] getBufferArray() {
-        return bb.array();
-    }
-
-    public boolean isBufferEmpty() {
-        return bb == null || bb.array().length == 0;
-    }
-
-    public void wrap(byte[] array) {
-        bb = ByteBuffer.wrap(array);
-    }
-
-    public void wrap(byte[] array, ByteOrder order) {
-        this.wrap(array);
-        bb.order(order);
-    }
-
+    /**
+     * Translates a string from passed byte array, start and end indices
+     *
+     * @param array byte array containing the string
+     * @param start start index
+     * @param end   end index
+     * @return translated string
+     */
     public static String getString(byte[] array, int start, int end) {
 
+        // Return default value
         if (array == null || array.length == 0) {
             return "";
         }
@@ -54,85 +49,123 @@ public class FromBytesTranslator {
         return new String(Arrays.copyOfRange(array, start, end));
     }
 
+    /**
+     * Parse int8 (byte) value from bytes
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Byte>} wrapped int8 value
+     */
     public static PrimitiveValue<Byte> getInt8(byte[] array, ByteOrder order) {
-
-        if (array.length != EXPECTED_INT8_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT8_ARRAY_LENGTH);
         return new NumberValue<>(INT8, wrapArray(array, order).get());
     }
 
+    /**
+     * Parse int16 (short) value from bytes
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Short>} wrapped int16 value
+     */
     public static NumberValue<Short> getInt16(byte[] array, ByteOrder order) {
-
-        if (array.length != EXPECTED_INT16_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT16_ARRAY_LENGTH);
         return new NumberValue<>(INT16, wrapArray(array, order).getShort());
     }
 
+    /**
+     * Parse int32 (int) value from bytes
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Integer>} wrapped int32 value
+     */
     public static NumberValue<Integer> getInt32(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_INT32_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT32_ARRAY_LENGTH);
         return new NumberValue<>(INT32, wrapArray(array, order).getInt());
     }
 
+    /**
+     * Parse int64 (long) value from bytes
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Long>} wrapped int64 value
+     */
     public static NumberValue<Long> getInt64(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_INT64_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT64_ARRAY_LENGTH);
         return new NumberValue<>(INT64, wrapArray(array, order).getLong());
     }
 
+    /**
+     * Parse float value from bytes
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Float>} wrapped float value
+     */
     public static NumberValue<Float> getFloat(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_FLOAT_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_FLOAT_ARRAY_LENGTH);
         return new NumberValue<>(FLOAT, wrapArray(array, order).getFloat());
     }
 
+    /**
+     * Parse double value from bytes
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Double>} wrapped double value
+     */
     public static NumberValue<Double> getDouble(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_DOUBLE_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_DOUBLE_ARRAY_LENGTH);
         return new NumberValue<>(DOUBLE, wrapArray(array, order).getDouble());
     }
 
+    /**
+     * Parse uint8 value from bytes, placed in a Java Short
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Short>} wrapped short value
+     */
     public static NumberValue<Short> getUInt8(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_INT8_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT8_ARRAY_LENGTH);
         return new NumberValue<>(UINT8, (short) Byte.toUnsignedInt(wrapArray(array, order).get()));
     }
 
+    /**
+     * Parse uint16 value from bytes, placed in a Java Integer
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Integer>} wrapped int value
+     */
     public static NumberValue<Integer> getUInt16(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_INT16_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT16_ARRAY_LENGTH);
         return new NumberValue<>(UINT16, Short.toUnsignedInt(wrapArray(array, order).getShort()));
     }
 
+    /**
+     * Parse uint32 value from bytes, placed in a Java Long
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<Long>} wrapped long value
+     */
     public static NumberValue<Long> getUInt32(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_INT32_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT32_ARRAY_LENGTH);
         return new NumberValue<>(UINT32, Integer.toUnsignedLong(wrapArray(array, order).getInt()));
     }
 
+    /**
+     * Parse uint64 value from bytes, placed in a Java BigInteger
+     *
+     * @param array array with bytes
+     * @param order {@link ByteOrder} preferred order
+     * @return {@link PrimitiveValue<BigInteger>} wrapped big integer value
+     */
     public static NumberValue<BigInteger> getUInt64(byte[] array, ByteOrder order) {
-        if (array.length != EXPECTED_INT64_ARRAY_LENGTH) {
-            throw new UnexpectedArrayLengthException();
-        }
-
+        assertByteArrayLength(array, EXPECTED_INT64_ARRAY_LENGTH);
         return new NumberValue<>(UINT64, new BigInteger(Long.toUnsignedString(wrapArray(array, order).getLong())));
     }
 
@@ -141,15 +174,41 @@ public class FromBytesTranslator {
         if (array == null) {
             throw new InvalidParameterException();
         }
+        ByteBuffer bb;
         // ByteBuffer is initialized with BIG_ENDIAN by default, so
         // we care about order only if its not null
         if (order != null) {
-            ByteBuffer bb = ByteBuffer.allocate(array.length).order(order).put(array);
-            bb.position(0);
-            return bb;
+            bb = ByteBuffer.allocate(array.length).order(order).put(array);
         } else {
-            return ByteBuffer.wrap(array);
+            bb = ByteBuffer.wrap(array);
         }
+        bb.position(0);
+        return bb;
+    }
+
+    /**
+     * Returns the wrapped array
+     *
+     * @return byte array or null if not wrapped a byte array
+     */
+    public byte[] getBufferArray() {
+        if (byteBuffer == null)
+            return null;
+
+        return byteBuffer.array();
+    }
+
+    public boolean isBufferEmpty() {
+        return byteBuffer == null || byteBuffer.array().length == 0;
+    }
+
+    public void wrap(byte[] array) {
+        byteBuffer = ByteBuffer.wrap(array);
+    }
+
+    public void wrap(byte[] array, ByteOrder order) {
+        this.wrap(array);
+        byteBuffer.order(order);
     }
 
     public PrimitiveValue<String> getString(int length) {
@@ -158,7 +217,7 @@ public class FromBytesTranslator {
 
     public PrimitiveValue<String> getString(int start, int end) {
         positionIndex = start + end;
-        byte[] temp = Arrays.copyOfRange(bb.array(), start, positionIndex);
+        byte[] temp = Arrays.copyOfRange(byteBuffer.array(), start, positionIndex);
         return new StringValue(new String(temp));
     }
 
@@ -177,9 +236,9 @@ public class FromBytesTranslator {
         }
 
         positionIndex = bufferPosition + type.getBytesCount();
-        byte[] temp = Arrays.copyOfRange(bb.array(), bufferPosition, positionIndex);
+        byte[] temp = Arrays.copyOfRange(byteBuffer.array(), bufferPosition, positionIndex);
 
-        ByteOrder order = bb.order();
+        ByteOrder order = byteBuffer.order();
         if (type.isOfType(DOUBLE)) {
             return getDouble(temp, order);
         } else if (type.isOfType(FLOAT)) {
@@ -218,15 +277,15 @@ public class FromBytesTranslator {
     }
 
     public void setOrder(ByteOrder order) {
-        bb.order(order);
+        byteBuffer.order(order);
     }
 
     public boolean hasMoreToRead() {
-        return positionIndex < bb.array().length;
+        return positionIndex < byteBuffer.array().length;
     }
 
     public boolean canReadValue(int bytesToRead) {
-        return bb.array().length >= positionIndex + bytesToRead;
+        return byteBuffer.array().length >= positionIndex + bytesToRead;
     }
 
     @SuppressWarnings("unchecked")
@@ -248,6 +307,12 @@ public class FromBytesTranslator {
             if (temp != null) {
                 pv.setValue(temp.getValue());
             }
+        }
+    }
+
+    private static void assertByteArrayLength(byte[] array, int expectedLength) {
+        if (array.length != expectedLength) {
+            throw new UnexpectedArrayLengthException();
         }
     }
 }

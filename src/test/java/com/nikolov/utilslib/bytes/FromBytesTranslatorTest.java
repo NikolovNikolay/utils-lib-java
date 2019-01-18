@@ -31,6 +31,12 @@ public class FromBytesTranslatorTest {
     }
 
     @Test
+    public void whenCallGetBufferArrayShouldReturnNullIfNotWrappedArray() {
+        FromBytesTranslator fbt = new FromBytesTranslator();
+        assertNull(fbt.getBufferArray());
+    }
+
+    @Test
     public void whenNoArrayWrappedBufferShouldBeEmpty() {
         FromBytesTranslator fbt = new FromBytesTranslator();
         assertTrue(fbt.isBufferEmpty());
