@@ -1,5 +1,17 @@
 package com.nikolov.utilslib.primitives;
 
+/**
+ * Wrapper over {@link java.lang.Number}. Can be used when dealing with the unsigned primitive types,
+ * that are not specified in Java. In such case the unsigned value is return in some greater number type.
+ * <p>
+ * E.g.
+ * UINT64 -> BigInteger
+ * UINT32 -> Long
+ * UINT16 -> Integer
+ *
+ * @param <T> Primitive wrapper that extends Number
+ * @see PrimitiveType
+ */
 public class NumberValue<T extends Number> implements PrimitiveValue<T> {
 
     private PrimitiveType type;

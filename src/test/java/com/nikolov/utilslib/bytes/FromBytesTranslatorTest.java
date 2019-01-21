@@ -2,10 +2,8 @@ package com.nikolov.utilslib.bytes;
 
 import com.nikolov.utilslib.bytes.exceptions.BufferEmptyException;
 import com.nikolov.utilslib.bytes.exceptions.UnexpectedArrayLengthException;
-import com.nikolov.utilslib.primitives.NumberValue;
-import com.nikolov.utilslib.primitives.PrimitiveType;
-import com.nikolov.utilslib.primitives.PrimitiveValue;
-import com.nikolov.utilslib.primitives.StringValue;
+import com.nikolov.utilslib.primitives.*;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -393,16 +391,18 @@ public class FromBytesTranslatorTest {
                 new NumberValue(DOUBLE),
                 new NumberValue(INT16),
                 new StringValue(12),
-                new NumberValue(UINT16)
+                new NumberValue(UINT16),
+                new ByteArrayValue(4)
         };
 
-        ByteBuffer bb = ByteBuffer.allocate(36)
+        ByteBuffer bb = ByteBuffer.allocate(40)
                 .putInt(2478490)
                 .putLong(-98090880L)
                 .putDouble(89.0983)
                 .putShort((short) 2837)
                 .put("How are you?".getBytes())
-                .putShort((short) -25900);
+                .putShort((short) -25900)
+                .put(new byte[]{123, 4, 67, 9});
         FromBytesTranslator fbt = new FromBytesTranslator();
         fbt.wrap(bb.array());
 
@@ -413,6 +413,16 @@ public class FromBytesTranslatorTest {
         assertEquals((short) 2837, template[3].getValue());
         assertEquals("How are you?", template[4].getValue());
         assertEquals(39636, template[5].getValue());
+        Assert.assertArrayEquals(new Byte[]{123, 4, 67, 9}, (Byte[]) template[6].getValue());
+    }
+
+    @Test
+    public void whenCallGetByteArrayItShouldReturnAnArrayWithLength() {
+
+        byte[] array = new byte[]{1, 2, 3, 4, 5, 56, 6, 5, 6, 7, 8, 9};
+        byte[] result = FromBytesTranslator.getByteArray(array, 3, 12);
+
+        Assert.assertArrayEquals(new byte[]{4, 5, 56, 6, 5, 6, 7, 8, 9}, result);
     }
 
     @Test(expected = UnexpectedArrayLengthException.class)

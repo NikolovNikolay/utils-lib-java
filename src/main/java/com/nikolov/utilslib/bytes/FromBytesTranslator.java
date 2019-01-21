@@ -1,11 +1,9 @@
 package com.nikolov.utilslib.bytes;
 
+import com.nikolov.utilslib.arrays.ArrayUtils;
 import com.nikolov.utilslib.bytes.exceptions.BufferEmptyException;
 import com.nikolov.utilslib.bytes.exceptions.UnexpectedArrayLengthException;
-import com.nikolov.utilslib.primitives.NumberValue;
-import com.nikolov.utilslib.primitives.PrimitiveType;
-import com.nikolov.utilslib.primitives.PrimitiveValue;
-import com.nikolov.utilslib.primitives.StringValue;
+import com.nikolov.utilslib.primitives.*;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -169,6 +167,19 @@ public class FromBytesTranslator {
         return new NumberValue<>(UINT64, new BigInteger(Long.toUnsignedString(wrapArray(array, order).getLong())));
     }
 
+    /**
+     * Returns part of an array
+     *
+     * @param array original array
+     * @param from  start of range (inclusive)
+     * @param to    end of range (exclusive)
+     * @return part of array
+     */
+    public static byte[] getByteArray(byte[] array, int from, int to)
+            throws ArrayIndexOutOfBoundsException, IllegalArgumentException, NullPointerException {
+        return Arrays.copyOfRange(array, from, to);
+    }
+
     private static ByteBuffer wrapArray(byte[] array, ByteOrder order) {
 
         if (array == null) {
@@ -219,6 +230,13 @@ public class FromBytesTranslator {
         positionIndex = start + end;
         byte[] temp = Arrays.copyOfRange(byteBuffer.array(), start, positionIndex);
         return new StringValue(new String(temp));
+    }
+
+    public PrimitiveValue<Byte[]> getByteArray(int length) {
+        int endIndex = positionIndex + length;
+        byte[] res = getByteArray(byteBuffer.array(), positionIndex, endIndex);
+        positionIndex = endIndex;
+        return new ByteArrayValue(ArrayUtils.wrapByteArray(res));
     }
 
     @SuppressWarnings("unchecked")
@@ -302,6 +320,8 @@ public class FromBytesTranslator {
                 temp = getNumber(((NumberValue) pv).getPrimitiveType());
             } else if (Objects.equals(type, String.class)) {
                 temp = getString(pv.getBytesCount());
+            } else if (Objects.equals(type, Byte[].class)) {
+                temp = getByteArray(pv.getBytesCount());
             }
 
             if (temp != null) {
